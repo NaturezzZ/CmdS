@@ -84,7 +84,7 @@ public:
    *
    * \returns Ptr to the queue.
    */
-  Ptr<Queue> GetQueue (void) const;
+  Ptr<Queue> GetQueue (int i) const;
   
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
@@ -191,7 +191,10 @@ private:
     std::string prefix,
     Ptr<NetDevice> nd,
     bool explicitFilename);
-
+    
+  Ptr<PointToPointNetDevice> nd1;
+  Ptr<PointToPointNetDevice> nd2;
+  
   ObjectFactory m_queueFactory;         //!< Queue Factory
   ObjectFactory m_channelFactory;       //!< Channel Factory
   ObjectFactory m_remoteChannelFactory; //!< Remote Channel Factory
