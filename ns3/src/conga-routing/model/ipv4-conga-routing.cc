@@ -112,6 +112,18 @@ Ipv4CongaRouting::EnableEcmpMode ()
 }
 
 void
+Ipv4CongaRouting::SetQueue (Ptr<Queue> q)
+{
+  m_queue = q;
+}
+
+Ptr<Queue>
+Ipv4CongaRouting:::GetQueue (void) const
+{ 
+  return m_queue;
+}
+
+void
 Ipv4CongaRouting::InitCongestion (uint32_t leafId, uint32_t port, uint32_t congestion)
 {
   std::map<uint32_t, std::map<uint32_t, std::pair<Time, uint32_t> > >::iterator itr =

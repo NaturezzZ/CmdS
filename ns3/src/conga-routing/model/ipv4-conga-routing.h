@@ -63,6 +63,24 @@ public:
 
   void EnableEcmpMode ();
 
+   /**
+   * Attach a queue to the PointToPointNetDevice.
+   *
+   * The PointToPointNetDevice "owns" a queue that implements a queueing 
+   * method such as DropTailQueue or RedQueue
+   *
+   * \param queue Ptr to the new queue.
+   */
+
+  void SetQueue (Ptr<Queue> queue);
+
+  /**
+   * Get a copy of the attached Queue.
+   *
+   * \returns Ptr to the queue.
+   */
+  Ptr<Queue> GetQueue (void) const;
+
   /* Inherit From Ipv4RoutingProtocol */
   virtual Ptr<Ipv4Route> RouteOutput (Ptr<Packet> p, const Ipv4Header &header, Ptr<NetDevice> oif, Socket::SocketErrno &sockerr);
   virtual bool RouteInput (Ptr<const Packet> p, const Ipv4Header &header, Ptr<const NetDevice> idev,
@@ -160,6 +178,15 @@ private:
   void PrintCongaFromLeafTable ();
   void PrintFlowletTable ();
   void PrintDreTable ();
+
+  /**
+   * The Queue which this PointToPointNetDevice uses as a packet source.
+   * Management of this Queue has been delegated to the PointToPointNetDevice
+   * and it has the responsibility for deletion.
+   * \see class DropTailQueue
+   */
+  
+  Ptr<Queue> m_queue;
 
 };
 
