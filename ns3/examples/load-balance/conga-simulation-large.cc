@@ -957,10 +957,10 @@ int main (int argc, char *argv[])
 
             if (runMode == TLB || runMode == DRB || runMode == PRESTO || runMode == WEIGHTED_PRESTO || runMode == Clove)
             {
-                std::pair<int, int> leafToSpine = std::make_pair<int, int> (i, j);
+                std::pair<int, int> leafToSpine = std::make_pair (i, j);
                 leafToSpinePath[leafToSpine] = netDeviceContainer.Get (0)->GetIfIndex ();
 
-                std::pair<int, int> spineToLeaf = std::make_pair<int, int> (j, i);
+                std::pair<int, int> spineToLeaf = std::make_pair (j, i);
                 spineToLeafPath[spineToLeaf] = netDeviceContainer.Get (1)->GetIfIndex ();
             }
 
