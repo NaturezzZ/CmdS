@@ -72,6 +72,11 @@ public:
   static TypeId GetTypeId (void);
   static const uint8_t PROT_NUMBER; //!< protocol number (0x6)
 
+  /**
+   * \brief Flag for send signal packet
+   */
+  bool sendSignalFlag;
+
   TcpL4Protocol ();
   virtual ~TcpL4Protocol ();
 

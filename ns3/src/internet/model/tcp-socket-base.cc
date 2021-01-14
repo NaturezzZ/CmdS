@@ -1627,6 +1627,7 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
         // The ssThresh and cWnd should be reduced because of the congestion notification
         m_tcb->m_ssThresh = m_congestionControl->GetSsThresh (m_tcb, BytesInFlight());
         m_tcb->m_cWnd = m_congestionControl->GetCwnd(m_tcb);
+        m_tcp->sendSignalFlag = true;
         m_tcb->m_congState = TcpSocketState::CA_CWR;
         m_tcb->m_queueCWR = true;
       }

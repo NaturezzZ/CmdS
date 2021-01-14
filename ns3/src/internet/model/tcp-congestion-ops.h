@@ -115,6 +115,7 @@ public:
 
   // TODO this function would be called only if the state goes into CA_CWR
   virtual uint32_t GetCwnd(Ptr<TcpSocketState> tcb);
+  virtual uint32_t GetCwnd(Ptr<TcpSocketState> tcb, Ptr<TcpL4Protocol> tcp);
 
   /**
    * \brief Timing information on received ACK

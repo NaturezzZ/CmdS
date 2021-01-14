@@ -90,6 +90,7 @@ TcpL4Protocol::GetTypeId (void)
 TcpL4Protocol::TcpL4Protocol ()
   : m_endPoints (new Ipv4EndPointDemux ()), m_endPoints6 (new Ipv6EndPointDemux ())
 {
+  sendSignalFlag = 0;
   NS_LOG_FUNCTION_NOARGS ();
   NS_LOG_LOGIC ("Made a TcpL4Protocol " << this);
 }
@@ -641,6 +642,17 @@ TcpL4Protocol::SendPacket (Ptr<Packet> pkt, const TcpHeader &outgoing,
                            Ptr<NetDevice> oif) const
 {
   NS_LOG_FUNCTION (this << pkt << outgoing << saddr << daddr << oif);
+
+  SocketQueueLengthTag queueLengthTag;
+  if(sendSignalFlag == true){
+    queueLengthTag.SetQueueLength(0xffffffffUL);
+  }
+  else{
+    queueLengthTag.SetQueueLength(0xfffffffeUL);
+  }
+  sendSignalFlag = false;
+  pkt->AddPacketTag (queueLengthTag);
+
   if (Ipv4Address::IsMatchingType (saddr))
     {
       NS_ASSERT (Ipv4Address::IsMatchingType (daddr));
