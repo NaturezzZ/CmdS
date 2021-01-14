@@ -105,6 +105,12 @@ PointToPointHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, b
   pcapHelper.HookDefaultSink<PointToPointNetDevice> (device, "PromiscSniffer", file);
 }
 
+Ptr<Queue> GetQueue (void) const
+{
+  Ptr<PointToPointNetDevice> device = nd->GetObject<PointToPointNetDevice> ();
+  return device->GetQueue ();
+}
+
 void 
 PointToPointHelper::EnableAsciiInternal (
   Ptr<OutputStreamWrapper> stream, 

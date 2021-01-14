@@ -25,6 +25,9 @@
 #include "ns3/object-factory.h"
 #include "ns3/net-device-container.h"
 #include "ns3/node-container.h"
+#include "ns3/point-to-point-net-device.h"
+#include "ns3/point-to-point-channel.h"
+#include "ns3/point-to-point-remote-channel.h"
 
 #include "ns3/trace-helper.h"
 
@@ -76,6 +79,13 @@ public:
                  std::string n3 = "", const AttributeValue &v3 = EmptyAttributeValue (),
                  std::string n4 = "", const AttributeValue &v4 = EmptyAttributeValue ());
 
+  /**
+   * Get a copy of the attached Queue.
+   *
+   * \returns Ptr to the queue.
+   */
+  Ptr<Queue> GetQueue (void) const;
+  
   /**
    * Set an attribute value to be propagated to each NetDevice created by the
    * helper.
