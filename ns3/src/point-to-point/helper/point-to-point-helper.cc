@@ -104,13 +104,17 @@ PointToPointHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, b
                                                      PcapHelper::DLT_PPP);
   pcapHelper.HookDefaultSink<PointToPointNetDevice> (device, "PromiscSniffer", file);
 }
-
-Ptr<Queue> GetQueue (void) const
+  
+Ptr<Queue> GetQueue (int i) const
 {
-  Ptr<PointToPointNetDevice> device = nd->GetObject<PointToPointNetDevice> ();
-  return device->GetQueue ();
+  if(i == 1)
+  return (nd1->GetObject<PointToPointNetDevice> ())->Getqueue();
+  
+  else
+  return (nd2->GetObject<PointToPointNetDevice> ())->Getqueue();
+  
 }
-
+  
 void 
 PointToPointHelper::EnableAsciiInternal (
   Ptr<OutputStreamWrapper> stream, 
@@ -247,6 +251,9 @@ PointToPointHelper::Install (Ptr<Node> a, Ptr<Node> b)
   //use a normal p2p channel, otherwise use a remote channel
   bool useNormalChannel = true;
   Ptr<PointToPointChannel> channel = 0;
+  
+  nd1 = devA;
+  nd2 = devB;
 
   if (MpiInterface::IsEnabled ())
     {
