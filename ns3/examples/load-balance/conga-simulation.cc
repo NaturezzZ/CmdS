@@ -263,7 +263,7 @@ int main (int argc, char *argv[])
     p2p.SetQueue ("ns3::DropTailQueue", "MaxPackets", UintegerValue (BUFFER_SIZE));
 
     congaRoutingHelper.GetCongaRouting (leaf0->GetObject<Ipv4> ())->
-		SetQueue (p2p.GetQueue());
+		SetQueue (p2p.GetQueue(1));
 
     
     NodeContainer leaf0_spine0_1 = NodeContainer (leaf0, spine0);
