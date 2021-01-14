@@ -639,6 +639,7 @@ TapBridge::CreateTap (void)
           //
           struct ifreq s;
           strncpy (s.ifr_name, m_tapDeviceName.c_str (), sizeof (s.ifr_name));
+          s.ifr_name[sizeof (s.ifr_name)-1] = '\0';
 
           NS_LOG_INFO ("Trying to get MacAddr of " << m_tapDeviceName);
           int ioctlResult = ioctl (sock, SIOCGIFHWADDR, &s);
