@@ -105,13 +105,13 @@ PointToPointHelper::EnablePcapInternal (std::string prefix, Ptr<NetDevice> nd, b
   pcapHelper.HookDefaultSink<PointToPointNetDevice> (device, "PromiscSniffer", file);
 }
   
-Ptr<Queue> GetQueue (int i) const
+Ptr<Queue> PointToPointHelper::GetQueue (int i) const
 {
   if(i == 1)
-  return (nd1->GetObject<PointToPointNetDevice> ())->Getqueue();
+  return (nd1->GetObject<PointToPointNetDevice> ())->GetQueue();
   
   else
-  return (nd2->GetObject<PointToPointNetDevice> ())->Getqueue();
+  return (nd2->GetObject<PointToPointNetDevice> ())->GetQueue();
   
 }
   

@@ -184,8 +184,8 @@ SpectrumValueTestSuite::SpectrumValueTestSuite ()
   AddTestCase (new SpectrumValueTestCase (tv5, v5, "tv5 = v1 * v2"), TestCase::QUICK);
   AddTestCase (new SpectrumValueTestCase (tv6, v6, "tv6 = v1 div v2"), TestCase::QUICK);
 
-  // std::cerr << v6 << std::endl;
-  // std::cerr << tv6 << std::endl;
+  // std::cerr <<  v6 << std::endl;
+  // std::cerr <<  tv6 << std::endl;
 
 
   tv3 = v1;

@@ -145,7 +145,7 @@ uint32_t
 TcpNewReno::SlowStart (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked)
 {
   NS_LOG_FUNCTION (this << tcb << segmentsAcked);
-
+  //std::cerr <<  "slow start" << std::endl;
   if (segmentsAcked >= 1)
     {
       tcb->m_cWnd += tcb->m_segmentSize;
@@ -169,7 +169,7 @@ void
 TcpNewReno::CongestionAvoidance (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked)
 {
   NS_LOG_FUNCTION (this << tcb << segmentsAcked);
-
+  //std::cerr << "avoidance" << std::endl;
   if (segmentsAcked > 0)
     {
       double adder = static_cast<double> (tcb->m_segmentSize * tcb->m_segmentSize) / tcb->m_cWnd.Get ();
@@ -193,7 +193,7 @@ void
 TcpNewReno::IncreaseWindow (Ptr<TcpSocketState> tcb, uint32_t segmentsAcked)
 {
   NS_LOG_FUNCTION (this << tcb << segmentsAcked);
-
+  //std::cerr << "increase window" << std::endl;
   if (tcb->m_cWnd < tcb->m_ssThresh)
     {
       segmentsAcked = SlowStart (tcb, segmentsAcked);

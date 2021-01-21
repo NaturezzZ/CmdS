@@ -1057,7 +1057,7 @@ TestRunnerImpl::Run (int argc, char *argv[])
   bool failed = false;
   if (tests.size () == 0)
     {
-      std::cerr << "Error:  no tests match the requested string" << std::endl;
+      std::cerr <<  "Error:  no tests match the requested string" << std::endl;
       return 1;
     }
   for (std::list<TestCase *>::const_iterator i = tests.begin (); i != tests.end (); ++i)

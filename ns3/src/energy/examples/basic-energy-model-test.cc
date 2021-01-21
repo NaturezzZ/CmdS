@@ -94,32 +94,32 @@ BasicEnergyUpdateTest::DoRun (void)
   if (StateSwitchTest (WifiPhy::IDLE))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy idle)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy idle)." << std::endl;
     }
   if (StateSwitchTest (WifiPhy::CCA_BUSY))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy cca busy)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy cca busy)." << std::endl;
     }
   if (StateSwitchTest (WifiPhy::TX))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy tx)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy tx)." << std::endl;
     }
   if (StateSwitchTest (WifiPhy::RX))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy rx)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy rx)." << std::endl;
     }
   if (StateSwitchTest (WifiPhy::SWITCHING))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy switching)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy switching)." << std::endl;
     }
   if (StateSwitchTest (WifiPhy::SLEEP))
     {
       ret = 1;
-      std::cerr << "Problem with state switch test (WifiPhy sleep)." << std::endl;
+      std::cerr <<  "Problem with state switch test (WifiPhy sleep)." << std::endl;
     }
   return ret;
 }
@@ -149,7 +149,7 @@ BasicEnergyUpdateTest::StateSwitchTest (WifiPhy::State state)
   // check list
   if ((models.GetN () == 0))
     {
-      std::cerr << "Model list is empty!." << std::endl;
+      std::cerr <<  "Model list is empty!." << std::endl;
       return true;
     }
   // get pointer
@@ -158,7 +158,7 @@ BasicEnergyUpdateTest::StateSwitchTest (WifiPhy::State state)
   // check pointer
   if ((devModel == 0))
     {
-      std::cerr << "NULL pointer to device model!." << std::endl;
+      std::cerr <<  "NULL pointer to device model!." << std::endl;
       return true;
     }
 
@@ -234,7 +234,7 @@ BasicEnergyUpdateTest::StateSwitchTest (WifiPhy::State state)
   if ((remainingEnergy > (estRemainingEnergy + m_tolerance)) ||
       (remainingEnergy < (estRemainingEnergy - m_tolerance)))
     {
-      std::cerr << "Incorrect remaining energy!" << std::endl;
+      std::cerr <<  "Incorrect remaining energy!" << std::endl;
       return true;
     }
 
@@ -244,7 +244,7 @@ BasicEnergyUpdateTest::StateSwitchTest (WifiPhy::State state)
   // check end state
   if (endState != state)
     {
-      std::cerr << "Incorrect end state!" << std::endl;
+      std::cerr <<  "Incorrect end state!" << std::endl;
       return true;
     }
   Simulator::Destroy ();
@@ -323,7 +323,7 @@ BasicEnergyDepletionTest::DoRun (void)
           if (DepletionTestCase (simTimeS, updateIntervalS))
             {
               ret = 1;
-              std::cerr << "Depletion test case problem." << std::endl;
+              std::cerr <<  "Depletion test case problem." << std::endl;
             }
           // reset callback count
           m_callbackCount = 0;
@@ -420,7 +420,7 @@ BasicEnergyDepletionTest::DepletionTestCase (double simTimeS,
   // check result, call back should only be invoked once
   if (m_numOfNodes != m_callbackCount)
     {
-      std::cerr << "Not all callbacks are invoked!" << std::endl;
+      std::cerr <<  "Not all callbacks are invoked!" << std::endl;
       return true;
     }
 

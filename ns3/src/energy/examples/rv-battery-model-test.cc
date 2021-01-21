@@ -644,27 +644,27 @@ main (int argc, char **argv)
   if (test.ConstantLoadTest (0.640, Seconds (2844.0)))
     {
       ret = 1;
-      std::cerr << "Problems with constant load test (640mA)." << std::endl;
+      std::cerr <<  "Problems with constant load test (640mA)." << std::endl;
     }
   if (test.ConstantLoadTest (0.320, Seconds (6146.0)))
     {
       ret = 1;
-      std::cerr << "Problems with constant load test (320mA)." << std::endl;
+      std::cerr <<  "Problems with constant load test (320mA)." << std::endl;
     }
   if (test.ConstantLoadTest (0.128, Seconds (16052.0)))
     {
       ret = 1;
-      std::cerr << "Problems with constant load test (128mA)." << std::endl;
+      std::cerr <<  "Problems with constant load test (128mA)." << std::endl;
     }
   if (test.ConstantLoadTest (0.064, Seconds (32561.0)))
     {
       ret = 1;
-      std::cerr << "Problems with constant load test (64mA)." << std::endl;
+      std::cerr <<  "Problems with constant load test (64mA)." << std::endl;
     }
   if (test.ConstantLoadTest (0.032, Seconds (65580.0)))
     {
       ret = 1;
-      std::cerr << "Problems with constant load test (32mA)." << std::endl;
+      std::cerr <<  "Problems with constant load test (32mA)." << std::endl;
     }
 
   // create load profiles for variable load test
@@ -683,7 +683,7 @@ main (int argc, char **argv)
                                  test.m_loadProfiles[i].itsyLifetime))
         {
           ret = 1;
-          std::cerr << "Problems with variable load test (Itsy)." << std::endl;
+          std::cerr <<  "Problems with variable load test (Itsy)." << std::endl;
         }
     }
 
@@ -700,7 +700,7 @@ main (int argc, char **argv)
                                  test.m_loadProfiles[i].dualFoilLifeTime))
         {
           ret = 1;
-          std::cerr << "Problems with variable load test (DUALFOIL)." << std::endl;
+          std::cerr <<  "Problems with variable load test (DUALFOIL)." << std::endl;
         }
     }
 
@@ -783,7 +783,7 @@ BatteryLifetimeTest::ConstantLoadTest (double load, Time expLifetime)
 
   if (actualLifetime != expLifetime)
     {
-      std::cerr << "ConstantLoadTest: Incorrect lifetime for load " << load << std::endl;
+      std::cerr <<  "ConstantLoadTest: Incorrect lifetime for load " << load << std::endl;
       return true;
     }
 
@@ -882,7 +882,7 @@ BatteryLifetimeTest::VariableLoadTest (std::vector<double> loads,
   if ((actualLifetime.GetSeconds ()) > (expLifetime.GetSeconds ()) + (120) ||
       (actualLifetime.GetSeconds ()) < (expLifetime.GetSeconds ()) - (120))
     {
-      std::cerr << "VariableLoadTest: Incorrect lifetime." << std::endl;
+      std::cerr <<  "VariableLoadTest: Incorrect lifetime." << std::endl;
       return true;
     }
 

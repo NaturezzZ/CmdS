@@ -1588,8 +1588,8 @@ TcpSocketBase::ProcessEstablished (Ptr<Packet> packet, const TcpHeader& tcpHeade
 void
 TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
 {
+  uint32_t oldcwnd = m_tcb->m_cWnd;
   NS_LOG_FUNCTION (this << tcpHeader);
-
   NS_ASSERT (0 != (tcpHeader.GetFlags () & TcpHeader::ACK));
   NS_ASSERT (m_tcb->m_segmentSize > 0);
 
@@ -1627,6 +1627,8 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
         // The ssThresh and cWnd should be reduced because of the congestion notification
         m_tcb->m_ssThresh = m_congestionControl->GetSsThresh (m_tcb, BytesInFlight());
         m_tcb->m_cWnd = m_congestionControl->GetCwnd(m_tcb);
+        std::cerr << "cwnd: " << m_tcb->m_cWnd << std::endl;
+        NS_LOG_ERROR ("CmdS! Signal Flag");
         m_tcp->sendSignalFlag = true;
         m_tcb->m_congState = TcpSocketState::CA_CWR;
         m_tcb->m_queueCWR = true;
@@ -1691,11 +1693,20 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
 
           NS_LOG_DEBUG ("OPEN -> DISORDER");
         }
-      else if (m_tcb->m_congState == TcpSocketState::CA_DISORDER ||
-              m_tcb->m_congState == TcpSocketState::CA_CWR) //TODO PLEASE CHECK
+      else if (m_tcb->m_congState == TcpSocketState::CA_RECOVERY)
+        { // Increase cwnd for every additional dupack (RFC2582, sec.3 bullet #3)
+          m_tcb->m_cWnd += m_tcb->m_segmentSize;
+          NS_LOG_ERROR("!!!!!");
+          NS_LOG_INFO (m_dupAckCount << " Dupack received in fast recovery mode."
+                       "Increase cwnd to " << m_tcb->m_cWnd);
+          SendPendingData (m_connected);
+        }
+      else// (m_tcb->m_congState == TcpSocketState::CA_DISORDER ||
+            //  m_tcb->m_congState == TcpSocketState::CA_CWR) //TODO PLEASE CHECK
         {
           if ((m_dupAckCount == m_retxThresh) && (m_highRxAckMark >= m_recover))
             {
+              std::cerr << "?????" << std::endl;
               // triple duplicate ack triggers fast retransmit (RFC2582 sec.3 bullet #1)
               NS_LOG_DEBUG (TcpSocketState::TcpCongStateName[m_tcb->m_congState] <<
                             " -> RECOVERY");
@@ -1704,7 +1715,11 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
 
               m_tcb->m_ssThresh = m_congestionControl->GetSsThresh (m_tcb,
                                                                     BytesInFlight ());
+              m_tcb->m_ssThresh = m_tcb->m_cWnd / 2;
               m_tcb->m_cWnd = m_tcb->m_ssThresh + m_dupAckCount * m_tcb->m_segmentSize;
+              NS_LOG_ERROR ("CmdS! Signal Flag");
+              //std::cerr << "11111" <<std::endl;
+              m_tcp->sendSignalFlag = true;
               NS_LOG_INFO (m_dupAckCount << " dupack. Enter fast recovery mode." <<
                            "Reset cwnd to " << m_tcb->m_cWnd << ", ssthresh to " <<
                            m_tcb->m_ssThresh << " at fast recovery seqnum " << m_recover);
@@ -1718,14 +1733,7 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
               m_nextTxSequence += sz;
             }
         }
-      else if (m_tcb->m_congState == TcpSocketState::CA_RECOVERY)
-        { // Increase cwnd for every additional dupack (RFC2582, sec.3 bullet #3)
-          m_tcb->m_cWnd += m_tcb->m_segmentSize;
-          NS_LOG_INFO (m_dupAckCount << " Dupack received in fast recovery mode."
-                       "Increase cwnd to " << m_tcb->m_cWnd);
-          SendPendingData (m_connected);
-        }
-
+      std::cerr << m_dupAckCount << std::endl;
       // Artificially call PktsAcked. After all, one segment has been ACKed.
       m_congestionControl->PktsAcked (m_tcb, 1, m_lastRtt, withECE, m_highTxMark, ackNumber);
 
@@ -1815,6 +1823,7 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
         }
       else if (m_tcb->m_congState == TcpSocketState::CA_RECOVERY)
         {
+
           if (ackNumber < m_recover)
             {
               /* Partial ACK.
@@ -1833,7 +1842,7 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
                * arrive, execute step 4 of Section 3.2 of [RFC5681]).
                 */
               m_tcb->m_cWnd = SafeSubtraction (m_tcb->m_cWnd, bytesAcked);
-
+              //std::cerr << "safe sub" << std::endl;
               if (segsAcked >= 1)
                 {
                   m_tcb->m_cWnd += m_tcb->m_segmentSize;
@@ -1875,6 +1884,9 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
             { // Full ACK (RFC2582 sec.3 bullet #5 paragraph 2, option 1)
               m_tcb->m_cWnd = std::min (m_tcb->m_ssThresh.Get (),
                                     BytesInFlight () + m_tcb->m_segmentSize);
+              NS_LOG_ERROR ("CmdS! Signal Flag");
+              //std::cerr << "signal flag" <<std::endl;
+              m_tcp->sendSignalFlag = true;
               m_isFirstPartialAck = true;
               m_dupAckCount = 0;
               m_retransOut = 0;
@@ -1901,6 +1913,7 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
         }
       else if (m_tcb->m_congState == TcpSocketState::CA_LOSS)
         {
+
           // Go back in OPEN state
           m_isFirstPartialAck = true;
           m_congestionControl->PktsAcked (m_tcb, segsAcked, m_lastRtt, withECE, m_highTxMark, ackNumber);
@@ -1947,8 +1960,10 @@ TcpSocketBase::ReceivedAck (Ptr<Packet> packet, const TcpHeader& tcpHeader)
   // If there is any data piggybacked, store it into m_rxBuffer
   if (packet->GetSize () > 0)
     {
+
       ReceivedData (packet, tcpHeader);
     }
+    if(m_tcb->m_cWnd < oldcwnd)std::cerr << "new and past cwnd: "<< m_tcb->m_cWnd << ',' << oldcwnd << std::endl;
 }
 
 /* Received a packet upon LISTEN state. */
@@ -3251,12 +3266,14 @@ TcpSocketBase::ReceivedData (Ptr<Packet> p, const TcpHeader& tcpHeader)
     }
     if (found && ipv4EcnTag.GetEcn() == Ipv4Header::ECN_ECT1)
     {
+      //std::cerr << "1 " << m_tcb->m_cWnd << " " << m_tcb->m_ssThresh << std::endl;
       NS_LOG_LOGIC (this << " Received ECT1, notify the congestion control algorithm of the non congestion");
       m_tcb->m_ecnSeen = true;
       m_congestionControl->CwndEvent(m_tcb, TcpCongestionOps::CA_EVENT_ECN_NO_CE, this);
     }
     if (found && ipv4EcnTag.GetEcn() == Ipv4Header::ECN_CE)
     {
+      //std::cerr << "2" << std::endl;
       NS_LOG_LOGIC (this << " Received CE, notify the congestion control algorithm of the congestion");
       m_tcb->m_demandCWR = true;
       m_tcb->m_ecnSeen = true;
@@ -3606,6 +3623,9 @@ TcpSocketBase::Retransmit ()
       m_tcb->m_congState = TcpSocketState::CA_LOSS;
       m_tcb->m_ssThresh = m_congestionControl->GetSsThresh (m_tcb, BytesInFlight ());
       m_tcb->m_cWnd = m_tcb->m_segmentSize;
+      //std::cerr << "ajsdlkfjdasl" << std::endl;
+      NS_LOG_ERROR ("CmdS! Signal Flag");
+      m_tcp->sendSignalFlag = true;
     }
 
   m_nextTxSequence = m_txBuffer->HeadSequence (); // Restart from highest Ack
@@ -4053,6 +4073,8 @@ TcpSocketBase::GetResequenceBuffer (void) const
 void
 TcpSocketBase::UpdateCwnd (uint32_t oldValue, uint32_t newValue)
 {
+  if(newValue < oldValue) std::cerr << "happy!" << std::endl;
+  //std::cerr << "update cwnd " << oldValue << ' ' << newValue << std::endl;
   m_cWndTrace (oldValue, newValue);
 }
 
@@ -4085,6 +4107,7 @@ TcpSocketBase::Fork (void)
 uint32_t
 TcpSocketBase::SafeSubtraction (uint32_t a, uint32_t b)
 {
+  std::cerr << "sub" << std::endl;
   if (a > b)
     {
       return a-b;

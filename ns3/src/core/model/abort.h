@@ -49,7 +49,7 @@
  */
 #define NS_ABORT_MSG(msg)                                              \
   do {                                                                 \
-      std::cerr << "aborted. ";                                        \
+      std::cerr <<  "aborted. ";                                        \
       NS_FATAL_ERROR (msg);                                            \
   } while (false)
 
@@ -78,7 +78,7 @@
   do {                                                                 \
     if (cond)                                                          \
       {                                                                \
-        std::cerr << "aborted. cond=\"" << # cond << ", ";             \
+        std::cerr <<  "aborted. cond=\"" << # cond << ", ";             \
         NS_FATAL_ERROR_NO_MSG ();                                      \
       }                                                                \
     } while (false)
@@ -109,7 +109,7 @@
   do {                                                                 \
     if (cond)                                                          \
       {                                                                \
-        std::cerr << "aborted. cond=\"" << # cond << "\", ";           \
+        std::cerr <<  "aborted. cond=\"" << # cond << "\", ";           \
         NS_FATAL_ERROR (msg);                                          \
       }                                                                \
   } while (false)

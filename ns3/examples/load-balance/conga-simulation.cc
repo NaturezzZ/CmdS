@@ -32,7 +32,7 @@ extern "C"
 
 // The simulation starting and ending time
 #define START_TIME 0.0
-#define END_TIME 20.0
+#define END_TIME 10.0
 
 #define FLOW_LAUNCH_END_TIME 0.5
 
@@ -135,6 +135,8 @@ int main (int argc, char *argv[])
     cmd.AddValue ("load", "Load of the network, 0.0 - 1.0", load);
     cmd.AddValue ("asym", "Whether the topology is sym or asym", asym);
     cmd.Parse (argc, argv);
+
+    randomSeed = 2222;
 
     RunMode runMode;
     if (runModeStr.compare ("Conga") == 0)
@@ -262,9 +264,14 @@ int main (int argc, char *argv[])
     p2p.SetChannelAttribute ("Delay", TimeValue(LINK_LATENCY));
     p2p.SetQueue ("ns3::DropTailQueue", "MaxPackets", UintegerValue (BUFFER_SIZE));
 
-    congaRoutingHelper.GetCongaRouting (leaf0->GetObject<Ipv4> ())->
-		SetQueue (p2p.GetQueue(1));
+        
 
+
+    //congaRoutingHelper.GetCongaRouting (leaf0->GetObject<Ipv4> ())->
+	//	SetQueue (p2p.GetQueue(1));
+
+//NS_LOG_INFO ("AAAA");
+    
     
     NodeContainer leaf0_spine0_1 = NodeContainer (leaf0, spine0);
     NodeContainer leaf0_spine0_2 = NodeContainer (leaf0, spine0);
@@ -289,6 +296,8 @@ int main (int argc, char *argv[])
     NetDeviceContainer netdevice_leaf1_spine1_1 = p2p.Install (leaf1_spine1_1);
 
     NetDeviceContainer netdevice_leaf1_spine1_2;
+
+    
 
     ipv4.SetBase ("10.1.1.0", "255.255.255.0");
     Ipv4InterfaceContainer addr_leaf0_spine0_1 = ipv4.Assign (netdevice_leaf0_spine0_1);
@@ -534,6 +543,8 @@ int main (int argc, char *argv[])
     Simulator::Stop (Seconds (END_TIME));
     Simulator::Run ();
 
+    NS_LOG_INFO ("???");
+
     flowMonitor->CheckForLostPackets ();
 
     std::stringstream fileName;
@@ -574,6 +585,8 @@ int main (int argc, char *argv[])
 
     flowMonitor->SerializeToXmlFile(fileName.str (), true, true);
     linkMonitor->OutputToFile ("link-monitor-out.txt", &LinkMonitor::DefaultFormat);
+
+    
 
     Simulator::Destroy ();
     free_cdf (cdfTable);

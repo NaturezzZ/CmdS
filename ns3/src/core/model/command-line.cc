@@ -400,7 +400,7 @@ CommandLine::HandleArgument (const std::string &name, const std::string &value) 
             {
               if (!(*i)->Parse (value))
                 {
-                  std::cerr << "Invalid argument value: "
+                  std::cerr <<  "Invalid argument value: "
                             << name << "=" << value << std::endl;
                   std::exit (1);
                 }
@@ -414,7 +414,7 @@ CommandLine::HandleArgument (const std::string &name, const std::string &value) 
   if (!Config::SetGlobalFailSafe (name, StringValue (value))
       && !Config::SetDefaultFailSafe (name, StringValue (value)))
     {
-      std::cerr << "Invalid command-line arguments: --"
+      std::cerr <<  "Invalid command-line arguments: --"
                 << name << "=" << value << std::endl;
       PrintHelp (std::cerr);
       std::exit (1);

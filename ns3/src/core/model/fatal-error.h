@@ -73,7 +73,7 @@
 #define NS_FATAL_ERROR_IMPL_NO_MSG(fatal) \
   do                                                      \
     {                                                     \
-      std::cerr << "file=" << __FILE__ << ", line=" <<    \
+      std::cerr <<  "file=" << __FILE__ << ", line=" <<    \
         __LINE__ << std::endl;                            \
       ::ns3::FatalImpl::FlushStreams ();                  \
       if (fatal) std::terminate ();                       \
@@ -84,7 +84,7 @@
 #define NS_FATAL_ERROR_IMPL(msg,fatal) \
   do                                                    \
     {                                                   \
-      std::cerr << "msg=\"" << msg << "\", ";           \
+      std::cerr <<  "msg=\"" << msg << "\", ";           \
       NS_FATAL_ERROR_IMPL_NO_MSG (fatal);               \
     }                                                   \
   while (false)

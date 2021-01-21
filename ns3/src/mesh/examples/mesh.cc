@@ -239,12 +239,12 @@ MeshTest::Report ()
     {
       std::ostringstream os;
       os << "mp-report-" << n << ".xml";
-      std::cerr << "Printing mesh point device #" << n << " diagnostics to " << os.str () << "\n";
+      std::cerr <<  "Printing mesh point device #" << n << " diagnostics to " << os.str () << "\n";
       std::ofstream of;
       of.open (os.str ().c_str ());
       if (!of.is_open ())
         {
-          std::cerr << "Error: Can't open file " << os.str () << "\n";
+          std::cerr <<  "Error: Can't open file " << os.str () << "\n";
           return;
         }
       mesh.Report (*i, of);

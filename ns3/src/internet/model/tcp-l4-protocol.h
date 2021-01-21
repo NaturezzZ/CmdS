@@ -75,7 +75,7 @@ public:
   /**
    * \brief Flag for send signal packet
    */
-  bool sendSignalFlag;
+  mutable bool sendSignalFlag;
 
   TcpL4Protocol ();
   virtual ~TcpL4Protocol ();

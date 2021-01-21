@@ -43,6 +43,8 @@
 #include "tcp-socket-base.h"
 #include "rtt-estimator.h"
 
+#include "ns3/ipv4-cmds-tag.h"
+
 #include <vector>
 #include <sstream>
 #include <iomanip>
@@ -643,23 +645,27 @@ TcpL4Protocol::SendPacket (Ptr<Packet> pkt, const TcpHeader &outgoing,
 {
   NS_LOG_FUNCTION (this << pkt << outgoing << saddr << daddr << oif);
 
-  SocketQueueLengthTag queueLengthTag;
-  if(sendSignalFlag == true){
-    queueLengthTag.SetQueueLength(0xffffffffUL);
-  }
-  else{
-    queueLengthTag.SetQueueLength(0xfffffffeUL);
-  }
-  sendSignalFlag = false;
-  pkt->AddPacketTag (queueLengthTag);
+  
 
   if (Ipv4Address::IsMatchingType (saddr))
     {
       NS_ASSERT (Ipv4Address::IsMatchingType (daddr));
 
+      Ipv4CmdSTag cmdsTag;
+      if (sendSignalFlag == true)
+        {
+          NS_LOG_ERROR ("Switching!!!");
+          cmdsTag.SetQueueSize(Ipv4CmdSTag::DO_SWITCH);
+        }
+      else
+        {
+          cmdsTag.SetQueueSize(Ipv4CmdSTag::NO_SWITCH);
+        }
+      sendSignalFlag = false;
+      pkt->AddPacketTag (cmdsTag);
+      
       SendPacketV4 (pkt, outgoing, Ipv4Address::ConvertFrom (saddr),
                     Ipv4Address::ConvertFrom (daddr), oif);
-
       return;
     }
   else if (Ipv6Address::IsMatchingType (saddr))

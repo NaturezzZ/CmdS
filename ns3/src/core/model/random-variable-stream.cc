@@ -1622,7 +1622,7 @@ void EmpiricalRandomVariable::Validate ()
       ValueCDF& current = emp[i];
       if (current.value < prior.value || current.cdf < prior.cdf)
         { // Error
-          std::cerr << "Empirical Dist error,"
+          std::cerr <<  "Empirical Dist error,"
                << " current value " << current.value
                << " prior value "   << prior.value
                << " current cdf "   << current.cdf

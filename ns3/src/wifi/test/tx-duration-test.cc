@@ -103,7 +103,7 @@ TxDurationTest::CheckPayloadDuration (uint32_t size, WifiMode payloadMode, uint3
   double calculatedDurationMicroSeconds = (double)phy->GetPayloadDuration (size, txVector, preamble, testedFrequency).GetMicroSeconds  ();
   if (calculatedDurationMicroSeconds != knownDurationMicroSeconds)
     {
-      std::cerr << " size=" << size
+      std::cerr <<  " size=" << size
                 << " mode=" << payloadMode
                 << " datarate=" << payloadMode.GetDataRate (channelWidth, isShortGuardInterval, 1)
                 << " known=" << knownDurationMicroSeconds
@@ -118,7 +118,7 @@ TxDurationTest::CheckPayloadDuration (uint32_t size, WifiMode payloadMode, uint3
       calculatedDurationMicroSeconds = (double)phy->GetPayloadDuration (size, txVector, preamble, testedFrequency).GetMicroSeconds ();
       if (calculatedDurationMicroSeconds != knownDurationMicroSeconds + 6)
         {
-          std::cerr << " size=" << size
+          std::cerr <<  " size=" << size
                     << " mode=" << payloadMode
                     << " datarate=" << payloadMode.GetDataRate (channelWidth, isShortGuardInterval, 1)
                     << " known=" << knownDurationMicroSeconds
@@ -151,7 +151,7 @@ TxDurationTest::CheckTxDuration (uint32_t size, WifiMode payloadMode, uint32_t c
   double calculatedDurationMicroSeconds = ((double)phy->CalculateTxDuration (size, txVector, preamble, testedFrequency).GetNanoSeconds ()) / 1000;
   if (calculatedDurationMicroSeconds != knownDurationMicroSeconds)
     {
-      std::cerr << " size=" << size
+      std::cerr <<  " size=" << size
                 << " mode=" << payloadMode
                 << " datarate=" << payloadMode.GetDataRate (channelWidth, isShortGuardInterval, 1)
                 << " preamble=" << preamble
@@ -167,7 +167,7 @@ TxDurationTest::CheckTxDuration (uint32_t size, WifiMode payloadMode, uint32_t c
       calculatedDurationMicroSeconds = ((double)phy->CalculateTxDuration (size, txVector, preamble, testedFrequency).GetNanoSeconds ()) / 1000;
       if (calculatedDurationMicroSeconds != knownDurationMicroSeconds + 6)
         {
-          std::cerr << " size=" << size
+          std::cerr <<  " size=" << size
                     << " mode=" << payloadMode
                     << " datarate=" << payloadMode.GetDataRate (channelWidth, isShortGuardInterval, 1)
                     << " preamble=" << preamble

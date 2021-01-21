@@ -118,7 +118,7 @@ Ipv4CongaRouting::SetQueue (Ptr<Queue> q)
 }
 
 Ptr<Queue>
-Ipv4CongaRouting:::GetQueue (void) const
+Ipv4CongaRouting::GetQueue (void) const
 { 
   return m_queue;
 }

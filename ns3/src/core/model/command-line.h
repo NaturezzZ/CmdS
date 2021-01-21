@@ -192,8 +192,8 @@ namespace ns3 {
  *
  *   if (value1 * value2 < 0)
  *     {
- *       std::cerr << "value1 and value2 must have the same sign!" << std::endl;
- *       std::cerr << cmd;
+ *       std::cerr <<  "value1 and value2 must have the same sign!" << std::endl;
+ *       std::cerr <<  cmd;
  *       exit (-1);
  *     }
  * \endcode
@@ -298,7 +298,7 @@ public:
    *       cmd.Parse (argc, argv);
    *     ...
    *
-   *       std::cerr << cmd;
+   *       std::cerr <<  cmd;
    * \endcode
    *
    * \param [in,out] os The output stream to print on.
@@ -558,7 +558,7 @@ CommandLineHelper::UserItemParse (const std::string value, T & val)
  *    cmd.Parse (argc, argv);
  *    ...
  *    
- *    std::cerr << cmd;
+ *    std::cerr <<  cmd;
  * \endcode
  *
  * \param [in,out] os The stream to print on.
