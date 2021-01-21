@@ -1,6 +1,6 @@
 #include <core.p4>
 #include <tna.p4>
-
+#define CMDS 128
 
 
 /*************************************************************************
@@ -77,6 +77,12 @@ header tcp_h {
     bit<16>  urgent_ptr;
 }
 
+header cmds_h {
+    bit<8>   op_kind;
+    bit<8>   op_length;
+    bit<16>  op_queue_length;
+}
+
 header udp_h {
     bit<16>  src_port;
     bit<16>  dst_port;
@@ -97,6 +103,7 @@ struct my_ingress_headers_t {
     icmp_h             icmp;
     igmp_h             igmp;
     tcp_h              tcp;
+    cmds_h             cmds;
     udp_h              udp;
 }
 
@@ -123,16 +130,21 @@ struct  id4_pend_t
 }
 struct flow_id_t
 {
-bit<32>  ipsrc;
-bit<32> ipdst;
-bit<8> ipproto;
-bit<32> lookup;
+    bit<32>  ipsrc;
+    bit<32>  ipdst;
+    bit<8>   ipproto;
+    bit<32>  lookup;
 }
 struct my_ingress_metadata_t {
-    id1_fre_t id1_fre;
-    id2_ts_t id2_ts;
     flow_id_t flow_id;
-    id3_nexthop_t id3_nexthop;
+    bit<16> ecmp_group;
+    bit<1>  use_new;
+    bit<16> src_index;
+
+    bit<8>  tcp_op_type;
+    bit<8>  tcp_op_length;
+    bit<16> queue_length;
+    
     bit<32> id;
     bit<16> index;
     bit<32> ts;
@@ -146,7 +158,6 @@ struct my_ingress_metadata_t {
     bit<32> flag4pend;
     bit<32> flagforpend;
     bit<32> tsd;
-
 }
 
     /***********************  P A R S E R  **************************/
@@ -192,8 +203,9 @@ parser IngressParser(packet_in        pkt,
             6   : parse_tcp;
             17  : parse_udp;
             default : accept;
+        }
     }
-    }
+
     state parse_icmp {
         pkt.extract(hdr.icmp);
         transition accept;
@@ -206,9 +218,17 @@ parser IngressParser(packet_in        pkt,
     
     state parse_tcp {
         pkt.extract(hdr.tcp);
-        transition accept;
+        transition select(hdr.tcp.data_offset) {
+            4  : accept;
+            default : parse_option;
+        }
     }
     
+    state parse_option {
+        pkt.extract(hdr.cmds);
+        transition accept;
+    }
+
     state parse_udp {
         pkt.extract(hdr.udp);
         transition accept;}
@@ -227,6 +247,122 @@ control Ingress(/* User */
     Hash<bit<16>>(HashAlgorithm_t.CRC16) hash2;
     Hash<bit<4>>(HashAlgorithm_t.CRC8) hash3;
 
+    action calEcmpGroup(bit<16> id)
+    {
+        meta.ecmp_group = id;
+    }
+    table fib_lpm_t {
+        key = {
+            meta.flow_id.src_addr : exact;
+            meta.flow_id.dst_addr : lpm;
+        }
+        actions = {
+            calEcmpGroup;
+            NoAction;
+            drop;
+        }
+        default_action = drop;
+    }
+
+    action calnexthop() //计算ecmp下的nexthop的index 4bit
+    {
+        meta.hopindex=hash3.get({meta.flow_id.ipsrc,meta.flow_id.ipdst,meta.flow_id.ipproto,meta.flow_id.lookup});
+    }
+    table calnexthop_t
+    {
+        actions={calnexthop;}
+        default_action=calnexthop;
+    }
+
+    action findecmphop(bit<32> nh)
+    {
+        meta.ecmphop=nh;
+    }
+    table findecmphop_t //用ecmphop index和ecmp group找到对应的端口号
+    {
+        key = {
+            meta.hopindex : exact;
+            meta.ecmp_group : exact;
+        }
+        actions={
+            NoAction;
+            findecmphop;
+        }
+        default_action=NoAction;
+    }
+
+    Register<bit<16>, bit<16>>(128) routing_neighbor_queue_length;
+    RegisterAction<bit<16>, bit<16>, bit<16>>(routing_neighbor_queue_length) update_routing_queue_length=
+    {
+        void apply(inout bit<16> register_data) {
+            register_data = hdr.cmds.op_queue_length;
+        }
+    };
+
+    Register<bit<16>, bit<16>>(128) routing_best_in_ecmp_group;
+    RegisterAction<bit<16>, bit<16>, bit<16>>(routing_best_in_ecmp_group) get_routing_best_port = 
+    {
+        void apply(inout bit<16> register_data, out bit<16> result) {
+            result = register_data;
+        }
+    }
+
+    Register<bit<16>, bit<16>>(128) forwarding_best_in_ecmp_group;
+    RegisterAction<bit<16>, bit<16>, bit<16>>(forwarding_best_in_ecmp_group) get_forwarding_best_port = 
+    {
+        void apply(inout bit<16> register_data, out bit<16> result) {
+            result = register_data;
+        }
+    }
+
+    Register<bit<1>, bit<1>>(1) is_cmd_routing;
+    RegisterAction<bit<1>, bit<1>, bit<1>>(is_cmd_routing) get_cmd_routing_status = 
+    {
+        void apply(inout bit<1> register_data, out bit<1> result) {
+            result = register_data;
+        }
+    }
+    RegisterAction<bit<1>, bit<1>, bit<1>>(is_cmd_routing) set_cmd_status_to_routing = 
+    {
+        void apply(inout bit<1> register_data) {
+            register_data = 1;
+        }
+    }
+    RegisterAction<bit<1>, bit<1>, bit<1>>(is_cmd_routing) set_cmd_status_to_forwarding = 
+    {
+        void apply(inout bit<1> register_data) {
+            register_data = 0;
+        }
+    }
+
+    apply {
+        calnexthop_t.apply();
+        fib_lpm_t.apply();
+        if(hdr.cmds.isValid() && hdr.cmds.op_kind == CMDS) {
+            if(hdr.cmds.op_queue_length == CMDS_ROUTING) {
+                set_cmd_status_to_routing.execute(0);
+
+            }
+            else if(hdr.cmds.op_queue_length == CMDS_FORWARDING) {
+
+            }
+            else {
+
+            }
+        }
+        else {
+            findecmphop_t.apply();
+        }
+
+    }
+
+/**********************************************************/
+/*                                                        */
+/**********************************************************/
+/*                                                        */
+/**********************************************************/
+/*                                                        */
+/**********************************************************/
 
 
 
@@ -234,7 +370,7 @@ control Ingress(/* User */
     Register<id1_fre_t, bit<16>>(0xFFFF) id1_fre_reg1;
     RegisterAction<id1_fre_t, bit<16>, bit<32>>(id1_fre_reg1) work1_fre=
     {
-void apply(inout id1_fre_t register_data, out bit<32> result) {
+        void apply(inout id1_fre_t register_data, out bit<32> result) {
             if (register_data.id1==meta.id)
             {
                 register_data.fre=register_data.fre+k;
@@ -401,9 +537,8 @@ table setegressport_t
 
 //third step for scheduling
 Register<id3_nexthop_t, bit<16>>(0xFFFF) id3_nexthop_reg;
-RegisterAction<id3_nexthop_t, bit<16>, bit<32>>(id3_nexthop_reg) work3_sch=
- {
-void apply(inout id3_nexthop_t register_data, out bit<32> result) {
+RegisterAction<id3_nexthop_t, bit<16>, bit<32>>(id3_nexthop_reg) work3_sch= {
+    void apply(inout id3_nexthop_t register_data, out bit<32> result) {
 
            if (meta.nexthop!=0)
            {
@@ -507,10 +642,10 @@ table getflag_t
            meta.finalhop=meta.ecmphop;
        }
 
-setegressport_t.apply();
+        setegressport_t.apply();
 
-findindex.apply();
-c.count(meta.counterindex);
+        findindex.apply();
+        c.count(meta.counterindex);
     }
 
 }
