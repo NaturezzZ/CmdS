@@ -54,11 +54,11 @@
 #include "tcp-header.h"
 #include "tcp-option-winscale.h"
 #include "tcp-option-ts.h"
-//#include "tcp-option-sack-permitted.h"
-//#include "tcp-option-sack.h"
+#include "tcp-option-sack-permitted.h"
+#include "tcp-option-sack.h"
 #include "tcp-congestion-ops.h"
-//#include "tcp-recovery-ops.h"
-//#include "ns3/tcp-rate-ops.h"
+#include "tcp-recovery-ops.h"
+#include "tcp-rate-ops.h"
 
 #include <math.h>
 #include <algorithm>
